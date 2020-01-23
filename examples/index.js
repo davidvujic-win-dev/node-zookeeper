@@ -3,6 +3,7 @@ const { electLeader } = require('./electleader.js');
 const { createWorker } = require('./createworker.js');
 const { listen } = require('./addlistener.js');
 const { addTask } = require('./addtask.js');
+const { deleteNodes } = require('./teardown.js');
 
 const logger = require('./logger.js');
 const notifier = require('./notifier.js');
@@ -11,6 +12,7 @@ notifier.on('connect', message => logger.log('connect', message));
 notifier.on('createNode', message => logger.log('createNode', message));
 notifier.on('addTask', message => logger.log('addTask', message));
 notifier.on('close', message => logger.log('close', message));
+notifier.on('deleteNode', message => logger.log('deleteNode', message));
 
 notifier.on('onChildren', (children) => {
     children.forEach((child) => {
@@ -19,6 +21,7 @@ notifier.on('onChildren', (children) => {
 });
 
 async function init() {
+    await deleteNodes(['/workers', '/assign', '/tasks', '/status']);
     await createNodes(['/workers', '/assign', '/tasks', '/status']);
 
     notifier.on('leader', async (master) => {
